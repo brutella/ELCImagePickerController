@@ -23,7 +23,7 @@
 	[elcPicker setDelegate:self];
     
     ELCImagePickerDemoAppDelegate *app = (ELCImagePickerDemoAppDelegate *)[[UIApplication sharedApplication] delegate];
-	[app.viewController presentModalViewController:elcPicker animated:YES];
+    [app.viewController presentViewController:elcPicker animated:YES completion:^{}];
     [elcPicker release];
     [albumController release];
 }

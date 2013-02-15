@@ -13,13 +13,12 @@
 	ALAssetsGroup *assetGroup;
 	
 	NSMutableArray *elcAssets;
-	int selectedAssets;
 	
 	id parent;
 	
 	NSOperationQueue *queue;
+    UIActivityIndicatorView *loadingIndicatorView;
 }
-
 @property (nonatomic, assign) id parent;
 @property (nonatomic, assign) ALAssetsGroup *assetGroup;
 @property (nonatomic, retain) NSMutableArray *elcAssets;

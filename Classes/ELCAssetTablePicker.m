@@ -22,7 +22,19 @@
 @synthesize selectedAssetsLabel;
 @synthesize assetGroup, elcAssets;
 
--(void)viewDidLoad {
+- (void)dealloc
+{
+    [loadingIndicatorView release];
+    
+    [elcAssets release];
+    [selectedAssetsLabel release];
+    [super dealloc];
+}
+
+- (void)viewDidLoad {
+    loadingIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    loadingIndicatorView.color = [UIColor grayColor];
+    
     _selectedAssets = [[NSMutableSet alloc] init];
 	[self.tableView setSeparatorColor:[UIColor clearColor]];
 	[self.tableView setAllowsSelection:NO];
@@ -36,9 +48,15 @@
 	[self.navigationItem setTitle:NSLocalizedString(@"Loading...", @"Loading...")];
 
 	[self performSelectorInBackground:@selector(preparePhotos) withObject:nil];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
     
-    // Show partial while full list loads
-	[self.tableView performSelector:@selector(reloadData) withObject:nil afterDelay:.5];
+    loadingIndicatorView.center = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
+    [loadingIndicatorView startAnimating];
+    [self.view addSubview:loadingIndicatorView];
 }
 
 -(void)preparePhotos {
@@ -60,7 +78,18 @@
      }];
     NSLog(@"done enumerating photos");
 	
+    [loadingIndicatorView removeFromSuperview];
+    [loadingIndicatorView release];
+    loadingIndicatorView = nil;
+    
 	[self.tableView reloadData];
+    // Scroll to bottom
+    NSInteger numberOfRows = ceil([self.assetGroup numberOfAssets] / 4.0);
+    if (numberOfRows > 0) {
+        NSIndexPath *lastIndexPath = [NSIndexPath indexPathForRow:numberOfRows-1 inSection:0];
+        [self.tableView scrollToRowAtIndexPath:lastIndexPath atScrollPosition:UITableViewScrollPositionNone animated:NO];
+    }
+    
 	[self.navigationItem setTitle:NSLocalizedString(@"Pick Photos", @"Pick Photos")];
     
     [pool release];
@@ -205,13 +234,6 @@
     if (firstSelection) {
         [self.tableView reloadData];
     }
-}
-
-- (void)dealloc 
-{
-    [elcAssets release];
-    [selectedAssetsLabel release];
-    [super dealloc];    
 }
 
 @end
